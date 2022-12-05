@@ -10,8 +10,8 @@ import icone_quase from "../assets/img/icone_quase.png";
 export default function Deck({ respondidas, setRespondidas }) {
   const [abertas, setAbertas] = useState([])
   const [viradas, setViradas] = useState([])
-  const [corretoA, setCorretoA] = useState([])
-  const [corretoB, setCorretoB] = useState([])
+  const [zap, setZap] = useState([])
+  const [parcial, setParcial] = useState([])
   const [incorreto, setInorreto] = useState([])
 
   return lista.map((card) => respondidas.includes(card) || !(abertas.includes(card.question)) ? <CardFechado card={card}  /> : <CardAberto card={card} />)
@@ -20,14 +20,18 @@ export default function Deck({ respondidas, setRespondidas }) {
     return (
       <StyledPerguntaFechada respondidas={respondidas.includes(card)} cor={definirCor(card)}>
         <p data-test="flashcard-text">Pergunta {lista.indexOf(card) + 1}</p>
-        <img data-test="play-btn" onClick={() => (setAbertas([...abertas, card.question]))} src={definirIcone(card)} alt="" />
+        
+        {respondidas.includes(card) 
+        ? definirIcone(card) 
+        : <img data-test="play-btn" onClick={() => (setAbertas([...abertas, card.question]))} src={setaPlay} alt="" /> }
+        
       </StyledPerguntaFechada>
     )
 
     function definirCor(card) {
-      if (corretoA.includes(card)) {
+      if (zap.includes(card)) {
         return "#2fbe34";
-      } else if (corretoB.includes(card)) {
+      } else if (parcial.includes(card)) {
         return "#ff922e"
       } else if (incorreto.includes(card)) {
         return "#ff3030"
@@ -37,14 +41,12 @@ export default function Deck({ respondidas, setRespondidas }) {
     }
 
     function definirIcone(card) {
-      if (corretoA.includes(card)) {
-        return icone_certo
-      } else if (corretoB.includes(card)) {
-        return icone_quase
+      if (zap.includes(card)) {
+        return <img data-test="zap-icon" onClick={() => (setAbertas([...abertas, card.question]))} src={icone_certo} alt="" />
+      } else if (parcial.includes(card)) {
+        return <img data-test="partial-icon" onClick={() => (setAbertas([...abertas, card.question]))} src={icone_quase} alt="" />
       } else if (incorreto.includes(card)) {
-        return icone_erro
-      } else {
-        return setaPlay
+        return <img data-test="no-icon" onClick={() => (setAbertas([...abertas, card.question]))} src={icone_erro} alt="" />
       }
     }
   }
@@ -69,11 +71,11 @@ export default function Deck({ respondidas, setRespondidas }) {
               Não Lembrei
             </button>
 
-            <button className="laranja" data-test="partial-btn" onClick={(e) => (setRespondidas([...respondidas, card]), setCorretoB([...corretoB, card]))} >
+            <button className="laranja" data-test="partial-btn" onClick={(e) => (setRespondidas([...respondidas, card]), setParcial([...parcial, card]))} >
               Quase não lembrei
             </button>
 
-            <button className="verde" data-test="zap-btn" onClick={(e) => (setRespondidas([...respondidas, card]), setCorretoA([...corretoA, card]))} >
+            <button className="verde" data-test="zap-btn" onClick={(e) => (setRespondidas([...respondidas, card]), setZap([...zap, card]))} >
               Zap
             </button>
           </StyledContainerBotoes>
