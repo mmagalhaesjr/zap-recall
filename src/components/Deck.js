@@ -3,62 +3,80 @@ import styled from "styled-components";
 import lista from "./Lista"
 import setaVirar from "../assets/img/seta_virar.png";
 import setaPlay from "../assets/img/seta_play.png";
+import icone_certo from "../assets/img/icone_certo.png";
+import icone_erro from "../assets/img/icone_erro.png";
+import icone_quase from "../assets/img/icone_quase.png";
 
-
-export default function Deck() {
+export default function Deck({ respondidas, setRespondidas }) {
   const [abertas, setAbertas] = useState([])
   const [viradas, setViradas] = useState([])
-  console.log(viradas)
+  const [corretoA, setCorretoA] = useState([])
+  const [corretoB, setCorretoB] = useState([])
+  const [incorreto, setInorreto] = useState([])
 
-  
-
-  return lista.map((card) => abertas.includes(card.question) ? <CardAberto card={card} /> : <CardFechado card={card} />
-  )
+  return lista.map((card) => respondidas.includes(card) || !(abertas.includes(card.question)) ? <CardFechado card={card}  /> : <CardAberto card={card} />)
 
   function CardFechado({ card }) {
-
     return (
-      <StyledPerguntaFechada onClick={() => setAbertas([...abertas, card.question])}>
-
-        <p>Pergunta {lista.indexOf(card) + 1}</p>
-        <img src={setaPlay} alt="seta clicar" />
-
+      <StyledPerguntaFechada respondidas={respondidas.includes(card)} cor={definirCor(card)}>
+        <p data-test="flashcard-text">Pergunta {lista.indexOf(card) + 1}</p>
+        <img data-test="play-btn" onClick={() => (setAbertas([...abertas, card.question]))} src={definirIcone(card)} alt="" />
       </StyledPerguntaFechada>
     )
+
+    function definirCor(card) {
+      if (corretoA.includes(card)) {
+        return "#2fbe34";
+      } else if (corretoB.includes(card)) {
+        return "#ff922e"
+      } else if (incorreto.includes(card)) {
+        return "#ff3030"
+      } else {
+        return "#333333"
+      }
+    }
+
+    function definirIcone(card) {
+      if (corretoA.includes(card)) {
+        return icone_certo
+      } else if (corretoB.includes(card)) {
+        return icone_quase
+      } else if (incorreto.includes(card)) {
+        return icone_erro
+      } else {
+        return setaPlay
+      }
+    }
   }
 
   function CardAberto({ card }) {
-    
+
     if (!(viradas.includes(card.answer))) {
       return (
-        <StyledPerguntaAberta onClick={() => setViradas([...viradas, card.answer])}>
-
-          <p>{card.question}</p>
-          <img src={setaVirar} alt="virar carta" />
-
+        <StyledPerguntaAberta >
+          <p data-test="flashcard-text">{card.question}</p>
+          <img data-test="turn-btn" onClick={() => setViradas([...viradas, card.answer])} src={setaVirar} alt="virar carta" />
         </StyledPerguntaAberta>
       )
     } else {
       return (
-        <StyledPerguntaAberta onClick={''}>
+        <StyledPerguntaAberta>
 
-          <p>{card.answer}</p>
+          <p data-test="flashcard-text">{card.answer}</p>
 
           <StyledContainerBotoes>
-            <button class="vermelho" onCLick>
+            <button className="vermelho" data-test="no-btn" onClick={(e) => (setRespondidas([...respondidas, card]), setInorreto([...incorreto, card]))}>
               Não Lembrei
             </button>
 
-            <button class="laranja" onCLick>
+            <button className="laranja" data-test="partial-btn" onClick={(e) => (setRespondidas([...respondidas, card]), setCorretoB([...corretoB, card]))} >
               Quase não lembrei
             </button>
 
-            <button class="verde" onCLick>
+            <button className="verde" data-test="zap-btn" onClick={(e) => (setRespondidas([...respondidas, card]), setCorretoA([...corretoA, card]))} >
               Zap
             </button>
           </StyledContainerBotoes>
-
-          <img src={setaVirar} alt="virar carta" />
 
         </StyledPerguntaAberta>
       )
@@ -66,9 +84,7 @@ export default function Deck() {
   }
 }
 
-
-
-  const StyledPerguntaFechada = styled.div`
+const StyledPerguntaFechada = styled.div`
 width: 300px;
 height: 35px;
 background-color: #ffffff;
@@ -86,7 +102,8 @@ p {
   font-weight: 700;
   font-size: 16px;
   line-height: 19px;
-  color: #333333;
+  color: ${props => props.cor};
+  text-decoration: ${props => props.respondidas ? 'line-through' : 'none'} ;
 }
 img {
   bottom: 10px;
@@ -96,7 +113,7 @@ img {
 
 
 
-  const StyledPerguntaAberta = styled.div`
+const StyledPerguntaAberta = styled.div`
    width: 300px;
    margin: 12px;
    padding: 15px;
@@ -122,7 +139,7 @@ img {
    }
 `;
 
-  const StyledContainerBotoes = styled.div`
+const StyledContainerBotoes = styled.div`
   display: flex;
   width: 80%;
   justify-content: space-between;

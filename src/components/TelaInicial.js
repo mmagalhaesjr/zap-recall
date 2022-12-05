@@ -11,16 +11,14 @@ import Rodape from "./Rodape";
 
 
 export default function TelaInicial() {
-
+    const [respondidas,setRespondidas] = useState([])
    
  
 return(
     <StyledTelaInicial className="screen-container" >
-
             <Logo/>
-            <Deck/>
-            <Rodape/>
-
+            <Deck respondidas={respondidas} setRespondidas={setRespondidas}/> 
+            <Rodape respondidas={respondidas}/>
     </StyledTelaInicial>
     );
 

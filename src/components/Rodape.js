@@ -1,9 +1,11 @@
+import lista from "./Lista"
 import styled from "styled-components"
 
-export default function Rodape(){
+export default function Rodape({respondidas}){
+
     return(
-        <StyledFooter>
-            <p>boladao</p>
+        <StyledFooter data-test="footer">
+            {respondidas.length}/{lista.length} CONCLUÍDOS
         </StyledFooter>
     )
 }
